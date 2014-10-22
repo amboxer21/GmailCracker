@@ -9,6 +9,8 @@ use WWW::Curl::Easy;
 require Tk::Table;
 require Tk::FileSelect;
 
+$| = 1;
+
 my($UserName, $Password, $Site, $CurlReturn, $File, $Pane,
 	$ResponseCode, $Curl, $Path, $UserEntryText );
 
@@ -93,6 +95,8 @@ my $FileSelector = $MainWindow->FileSelect( -directory => '/' );
 
 			else {
 
+				&warning;
+
 				print "\nNot a list file.\n";
 
 			}
@@ -153,5 +157,20 @@ while(<FILE>) {
  }
 
 }
+
+sub warning {
+my $Tlw = $MainWindow->Toplevel;
+	$Tlw->geometry("260x100+50+50");
+	$Tlw->title('Warning');
+
+my $Label = $Tlw->Label( -text => "This is not a .list file. Please \nchose a file with the .list extension." )->pack( -side => 'top', 
+		-pady => '15' );
+
+	$Tlw->Button( -text => "OK",
+			-command => sub { $Tlw->withdraw }, )->pack( -side => 'bottom', 
+					-anchor => 'se', 
+					-padx => '5', 
+					-pady => '5' );
+};
 
 MainLoop;
