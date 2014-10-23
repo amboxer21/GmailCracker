@@ -127,6 +127,14 @@ $Yada = $ListEntry->get;
 
 
 $UserName = $UserEntry->get;
+$MainWindow->update;
+
+	if($UserName eq '') {
+		print "\nEmpty user Name.\n";
+		&empty_uname;
+		return;
+	}
+
 
 $Pane->insert("end", "\nGmail User Name => $UserName\n");
 $MainWindow->update;
@@ -225,3 +233,18 @@ if( $File =~ m/\/[a-zA-Z0-9].*\/+/i ) {
         }	
 
 }
+
+sub empty_uname {
+my $Tlw = $MainWindow->Toplevel;
+	$Tlw->geometry("260x100+50+50");
+	$Tlw->title('Warning');
+
+my $Label = $Tlw->Label( -text => "User Name is empty. Please \nprovide a user name." )->pack( -side => 'top', 
+		-pady => '15' );
+
+	$Tlw->Button( -text => "OK",
+			-command => sub { $Tlw->withdraw }, )->pack( -side => 'bottom', 
+					-anchor => 'se', 
+					-padx => '5', 
+					-pady => '5' );
+};
