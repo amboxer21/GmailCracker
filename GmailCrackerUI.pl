@@ -5,7 +5,6 @@ use warnings;
 
 use Tk;
 use WWW::Curl::Easy;
-use IO::Pipe;
 
 require Tk::Table;
 require Tk::FileSelect;
