@@ -5,13 +5,12 @@ use warnings;
 
 use Tk;
 use WWW::Curl::Easy;
-use IO::Pipe;
 
 require Tk::Table;
 require Tk::FileSelect;
 
-my($UserName, $Password, $Site, $CurlReturn, $File, $Pane, $ARG,
-	$ResponseCode, $Curl, $Path, $UserEntryText, $LogFile, $Yada );
+my($UserName, $Password, $Site, $CurlReturn, $File, $Pane,
+	$ResponseCode, $Curl, $Path, $Yada );
 
 my(@ARG, @Curl, @LogFile);
 
