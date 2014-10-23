@@ -5,6 +5,7 @@ use warnings;
 
 use Tk;
 use WWW::Curl::Easy;
+use IO::Pipe;
 
 require Tk::Table;
 require Tk::FileSelect;
@@ -71,9 +72,21 @@ my $FileSelector = $MainWindow->FileSelect( -directory => '/' );
 
 	if($File) {
 	
-		$Pane->insert("end", "\nDictionary Path => $File\n");
+		$Pane->insert("end", "\nThis is not a list file. Please chose a file with a .list extension.\n");
+
+		if( &path_check ) {	
 	
-		$ListEntry->insert("end", $File);
+			$Pane->insert("end", "\nDictionary Path => $File\n");
+
+			$ListEntry->insert("end", $File);
+
+		}
+
+			else {
+
+				&warning;
+
+			}
 
 	}
 
