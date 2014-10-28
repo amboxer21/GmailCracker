@@ -1,0 +1,23 @@
+The command line utility requires the WWW::Curl module to be installed. It takes 2 arguments. The first is the Gmail user name. 
+
+The second argument is the password list file. The passwd file must end with .list only because I wanted people to be conscious 
+
+of what files they were passing. 
+
+
+The UI requires a few more deps. For all of you uncomfortable with installing modules from the command line or from source via 
+
+cpan.org's tarball pkg's, there is a makefile to automate the installation of the deps. The Build.sh file removes all manual intervention.
+
+Run it once and thats it.
+
+
+NOTE: I have written this on my Gentoo box and am uncertain of anything pertaining to MS Windows. Also, if you're going to try and BF my
+
+email... GOOD LUCK! My password is strong and you'll never crack it ;)
+
+
+
+
+
+Anthony Guevara amboxer21@gmail.com 
