@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-#use strict;
+use strict;
 use warnings;
 
 use Tk;
@@ -10,7 +10,7 @@ require Tk::Table;
 require Tk::FileSelect;
 
 my($UserName, $Password, $Site, $CurlReturn, $File, $Pane,
-	$ResponseCode, $Curl, $Path, $Yada );
+	$ResponseCode, $Curl, $Path, $Yada, $Allow );
 
 my(@ARG, @Curl, @LogFile);
 
@@ -69,9 +69,9 @@ my $FileSelector = $MainWindow->FileSelect( -directory => '/' );
 
 	$File = $FileSelector->Show; 
 
-	if($File) {
+	if( defined( $File ) ) {
 	
-		$Pane->insert("end", "\nThis is not a list file. Please chose a file with a .list extension.\n");
+		$ListEntry->insert("end", $File);
 
 		if( &path_check ) {	
 	
@@ -80,12 +80,6 @@ my $FileSelector = $MainWindow->FileSelect( -directory => '/' );
 			$ListEntry->insert("end", $File);
 
 		}
-
-			else {
-
-				&warning;
-
-			}
 
 	}
 
@@ -103,23 +97,36 @@ sub Crackn {
 
 $Yada = $ListEntry->get;
 
+	$Allow = 0;
+
+	## CHECKS IF PATH ENTRY IS DEFINED. WHETHER BY MANUAL SPECIFICATION OR FILE CLICK BUTTON.
 	if( $Yada eq '' ) {
 
+		&empty_path;
+
 		print "File not selected\n";
+
 
 		$Pane->insert("end", "\nFile not selected.\n");
 
 	}
 
-		elsif( ! $File ) {
+
+		elsif( ! defined( $File ) && defined( $Yada ) ) {
 
 			$File = $Yada;
 
-			if( &path_check ) {
+			&path_check;
 
-				$Pane->insert("end", "\nDictionary Path => $File\n");
+			$Pane->insert("end", "\n\nCracking, please wait.\n\n");
+	
+			$MainWindow->update;
 
-			}
+			#if( &path_check ) {
+
+				#$Pane->insert("end", "\nDictionary Path => $File\n");
+
+			#}
 
 		}
 
@@ -136,9 +143,6 @@ $MainWindow->update;
 
 
 $Pane->insert("end", "\nGmail User Name => $UserName\n");
-$MainWindow->update;
-
-$Pane->insert("end", "\n\nCracking, please wait.\n\n");
 $MainWindow->update;
 
 open(FILE, '<', $File) or die "Cannot open $File: $!\n";
@@ -213,7 +217,7 @@ if( $File =~ m/\/[a-zA-Z0-9].*\/+/i ) {
 
                         #print $PathFile;
 
-			$ListEntry->insert("end", "$File");
+			#$ListEntry->insert("end", "$File");
 
 			$Pane->insert("end", "Dictionary Path => $File\n");
 			
@@ -231,7 +235,7 @@ if( $File =~ m/\/[a-zA-Z0-9].*\/+/i ) {
 
         }	
 
-}
+};
 
 sub empty_uname {
 my $Tlw = $MainWindow->Toplevel;
@@ -246,4 +250,25 @@ my $Label = $Tlw->Label( -text => "User Name is empty. Please \nprovide a user n
 					-anchor => 'se', 
 					-padx => '5', 
 					-pady => '5' );
+};
+
+sub empty_path {
+my $Tlw = $MainWindow->Toplevel;
+	$Tlw->geometry("260x100+50+50");
+	$Tlw->title('Warning');
+
+my $Label = $Tlw->Label( -text => "Path dir is empty. Please \nprovide a path name." )->pack( -side => 'top', 
+		-pady => '15' );
+
+	$Tlw->Button( -text => "OK",
+			-command => sub { $Tlw->withdraw }, )->pack( -side => 'bottom', 
+					-anchor => 'se', 
+					-padx => '5', 
+					-pady => '5' );
+};
+
+sub validity_check {
+
+
+
 };
