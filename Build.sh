@@ -36,15 +36,97 @@ echo -e "\n\nChanging directories...\n\n"
 
 }
 
+function tk_build() {
+
+echo -e "\n\nDownloading...\n\n"
+
+wget "https://cpan.metacpan.org/authors/id/S/SR/SREZIC/Tk-804.032.tar.gz"  &&
+
+echo -e "\n\nExtracting...\n\n";
+
+tar xzvf Tk-804.032.tar.gz &&
+
+echo -e "\n\nChanging directories...\n\n";
+
+        cd "Tk-804.032";
+
+	echo -e "\n\nBuilding...\n\n";
+
+        perl Makefile.PL &&
+
+        make &&
+
+	echo -e "\n\nInstalling...\n\n";
+
+        make install &&
+
+        echo -e "\n\nFinished\n\n";
+
+	echo -e "\n\nCleaning up...\n\n";
+
+	rm -rf PathTools* &&
+
+        return
+
+}
+
+function curl_build() {
+
+echo -e "\n\nDownloading...\n\n"
+
+wget "https://cpan.metacpan.org/authors/id/S/SZ/SZBALINT/WWW-Curl-4.17.tar.gz"  &&
+
+echo -e "\n\nExtracting...\n\n";
+
+tar xzvf WWW-Curl-4.17.tar.gz &&
+
+echo -e "\n\nChanging directories...\n\n";
+
+        cd "WWW-Curl-4.17";
+
+	echo -e "\n\nBuilding...\n\n";
+
+        perl Makefile.PL &&
+
+        make &&
+
+	echo -e "\n\nInstalling...\n\n";
+
+        make install &&
+
+        echo -e "\n\nFinished\n\n";
+
+	echo -e "\n\nCleaning up...\n\n";
+
+	rm -rf PathTools* &&
+
+        return
+
+}
+
 case $1 in
 
 "cwd")
 
-	echo -e "\n\nBuild CWD\n\n";
+	echo -e "\n\nBuild CWD.\n\n";
 
         cwd_build;
 
-	exit;
+	;;
+
+"tk")
+
+	echo -e "\n\nBuilding Tk.\n\n";
+
+	tk_build;
+
+	;;
+
+"curl")
+
+	echo -e "\n\nBuilding Curl.\n\n";
+
+	tk_build;
 
 	;;
 
