@@ -1,5 +1,15 @@
 #!/bin/bash
 
+FILE="Makefile.PL";
+
+        if [ ! -f $FILE ]; then
+
+                echo -e "\n\nMakefile.PL not found.\n\nPlease include the Makefile.PL file to continue.\n\n";
+
+                exit;
+
+        fi
+
 function cwd_build() {
 
 #wdir=($PWD);
