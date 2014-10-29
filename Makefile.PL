@@ -69,13 +69,11 @@ foreach $iter ( @Arr ) {
 
                                 if( $ARGV[0] eq "remote" && $' eq 'Tk.pm' ) {
 
-                                       	qx/perl -MCPAN -e 'force install "Tk"'/;
+                                       	`bash Build.sh\ tk`
 
                                 }
 
                                         elsif( $ARGV[0] eq "remote" && $' eq 'Cwd.pm' ) {
-
-						print getcwd() . "\n";
 
                                                 `bash Build.sh\ cwd`
 
@@ -83,7 +81,7 @@ foreach $iter ( @Arr ) {
 
                                         elsif( $ARGV[0] eq "remote" && $' eq 'Curl.pm' ) {
 
-                                                qx/perl -MCPAN -e 'force install "WWW::Curl"'/;
+                                                `bash Build.sh\ curl`
 
                                         }
 
