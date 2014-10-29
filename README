@@ -12,10 +12,9 @@ cpan.org's tarball pkg's, there is a makefile to automate the installation of th
 Run it once and thats it.
 
 
-NOTE: I have written this on my Gentoo box and am uncertain of anything pertaining to MS Windows. Also, if you're going to try and BF my
+NOTE: I have written this on my Gentoo box and am uncertain of anything pertaining to MS Windows.
 
-email... GOOD LUCK! My password is strong and you'll never crack it ;)
-
+THIS MODULE WILL NOT TAKE PASSWORD WITH SPACES ATM.
 
 
 
