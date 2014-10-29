@@ -1,7 +1,6 @@
-# Makefile.PL for My::Module
 use ExtUtils::MakeMaker;
-use Data::Dumper;
-use Cwd;
+#use Data::Dumper;
+#use Cwd;
 
 use strict;
 use warnings;
