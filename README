@@ -1,3 +1,5 @@
+THIS DOES NOT WORK ANYMORE DUE TO GOOGLE TIGHTENING SECURITY.
+
 The command line utility requires the WWW::Curl module to be installed. It takes 2 arguments. The first is the Gmail user name. 
 
 The second argument is the password list file. The passwd file must end with .list only because I wanted people to be conscious 
